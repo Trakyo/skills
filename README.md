@@ -54,7 +54,10 @@ stays short and the detail lives in `references/`. Validate with
 ## Source of truth
 
 This directory in the `trakyo` monorepo is canonical; the public repo
-`github.com/Trakyo/skills` is a copy of it. The rules here must not drift from
+`github.com/Trakyo/skills` is a copy of it, rewritten by
+`.github/workflows/publish-skills.yml` on every merge to `main` that touches
+`skills/` (never edit the public repo by hand). `src/__tests__/skills-spec.test.ts`
+pins the spec constraints in CI. The rules here must not drift from
 `src/lib/tracking/install-snippet.ts` (the tag shape and its reasoning),
 `workers/api/src/lib/setup-checks.ts` (the finding codes) and
 `workers/docs/pages/conversions.mdx` (the identity rules). When one of those
