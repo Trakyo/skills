@@ -16,9 +16,17 @@ three picks the right one.
 ## Install
 
 ```bash
-npx skills add Trakyo/skills                      # pick interactively
+npx skills add Trakyo/skills                      # from the GitHub repo, pick interactively
 npx skills add Trakyo/skills --skill trakyo-install -a claude-code
+npx skills add https://trakyo.io                  # from the domain, digest-verified against the release
+claude plugin marketplace add Trakyo/skills       # Claude Code plugin: all three skills
+claude plugin install trakyo@trakyo
 ```
+
+The domain install reads [`trakyo.io/.well-known/agent-skills/index.json`](https://trakyo.io/.well-known/agent-skills/index.json)
+(the [Agent Skills discovery index](https://github.com/cloudflare/agent-skills-discovery-rfc)),
+which names each skill's release tarball and its SHA-256 digest; the CLI refuses a
+tarball whose bytes do not match.
 
 Manual (any agent that reads `SKILL.md` files):
 
@@ -43,10 +51,13 @@ Read this before installing from any source, including this one.
   `POST https://api.trakyo.io/v1/setup/verify` per URL. It writes no files,
   spawns no processes, and reads no environment variable except `TRAKYO_API_KEY`.
   The key is sent as a bearer token to `api.trakyo.io` and nowhere else; it is
-  never printed. Its User-Agent names the script and version so a site owner can
-  recognise the traffic.
+  never printed. It identifies itself: `User-Agent: trakyo-skill/check-install@<version>`
+  on every request and `X-Trakyo-Skill: check-install@<version>` on the API call,
+  so a site owner can recognise the traffic and Trakyo can count skill-driven
+  requests per release. The header carries nothing about you.
 - **The `curl` examples** in the skills send only the JSON shown to
-  `api.trakyo.io`. An API key with the scope named next to each example
+  `api.trakyo.io`, plus `X-Trakyo-Skill: <skill>@<version>`, the same adoption
+  count as above. An API key with the scope named next to each example
   (`links:read` for verify, `conversions:write` for conversions) is enough; do
   not use a wider one.
 - **What the skills change in your project** is limited to what the task names:
@@ -64,6 +75,7 @@ Report a security concern to security@trakyo.io
 ```
 skills/
   CHANGELOG.md                      # one version for all three skills; tags on the public repo
+  .claude-plugin/                   # Claude Code plugin + marketplace manifests (same version)
   trakyo-install/
     SKILL.md
     references/checks.md            # the eight finding codes, same as the API
@@ -94,16 +106,21 @@ Every skill carries `evals/evals.json`: three realistic tasks, each with a fixtu
 project under `evals/files/` and assertions a grader can check in the output
 (exact tag shape, a redirect that keeps its query string, `identity.trakyo_id` on
 the conversion call). `evals/README.md` records the latest with-skill versus
-baseline run. Re-run them with Anthropic's `skill-creator` skill when you change
-a skill; a change that does not move the benchmark probably does not need to ship.
+baseline run on Claude Haiku 4.5, Sonnet 4.5 and Opus. Re-run them with
+Anthropic's `skill-creator` skill when you change a skill; a change that does not
+move the benchmark probably does not need to ship. The runs earn their keep in
+both directions: the v1.2.0 Opus pass found that `check-install.mjs --probe`
+never travelled the redirect chain it was meant to test.
 
 ## Versioning
 
 `skills/CHANGELOG.md` holds one version for all three skills. Every merge to `main`
 that changes a skill bumps it; the publish workflow tags the public repo
 `v<version>` and attaches one tarball plus a SHA-256 digest per skill to a GitHub
-release. `metadata.version` in each `SKILL.md` and the `VERSION` constant in the
-script equal that number, and CI fails when they drift.
+release, together with `index.json`, the discovery index that trakyo.io serves.
+`metadata.version` in each `SKILL.md`, the `VERSION` constant in the script, the
+plugin manifests and every documented `X-Trakyo-Skill` header equal that number,
+and CI fails when they drift.
 
 ## Source of truth
 
@@ -115,4 +132,7 @@ pins the spec constraints in CI. The rules here must not drift from
 `src/lib/tracking/install-snippet.ts` (the tag shape and its reasoning),
 `workers/api/src/lib/setup-checks.ts` (the finding codes) and
 `workers/docs/pages/conversions.mdx` (the identity rules). When one of those
-changes, change the skill in the same PR.
+changes, change the skill in the same PR. Two things are generated FROM the
+skills and checked in CI: the MCP server's `trakyo://install-guide` resource
+(`scripts/skills/sync-install-guide.mjs`, from `trakyo-install/SKILL.md`) and the
+release's `index.json` (`scripts/skills/build-well-known-index.mjs`).

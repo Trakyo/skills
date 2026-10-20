@@ -5,7 +5,7 @@ license: MIT
 compatibility: Any agent that reads SKILL.md. scripts/check-install.mjs needs Node.js 18+ (built-in fetch) and network access to the site under test and to api.trakyo.io; it writes no files and reads no environment variable other than TRAKYO_API_KEY.
 metadata:
   author: trakyo
-  version: "1.1.0"
+  version: "1.2.0"
   docs: https://trakyo.io/docs
 ---
 
@@ -31,7 +31,16 @@ The tag is exactly this, with HOST substituted:
 <script src="https://HOST/api/js/latest.js"></script>
 ```
 
-Rules, each with the reason, because the "obvious" improvements are the bugs:
+That is the whole tag. Every "improvement" to it is a bug; section 2 says why.
+
+Do not wrap it in a tag manager, a consent gate, or a lazy loader unless the site
+already gates *every* analytics script that way. If it must be gated, load it
+synchronously the moment consent is granted and before any embed renders.
+
+## 2. Gotchas
+
+Facts about this environment that defy reasonable assumptions. Each row is a way a
+correct-looking install lost attribution on a real site.
 
 | Rule | Why |
 |---|---|
@@ -42,11 +51,23 @@ Rules, each with the reason, because the "obvious" improvements are the bugs:
 | **Never self-host** | The script lives at `/api/js/latest.js` so fixes ship without anyone re-pasting. A local copy freezes the site on whatever version was downloaded. |
 | **Load from the account's own host** | A tag that loads from another account's host sends events to the wrong account. |
 
-Do not wrap it in a tag manager, a consent gate, or a lazy loader unless the site
-already gates *every* analytics script that way. If it must be gated, load it
-synchronously the moment consent is granted and before any embed renders.
+Three more that are not about the tag's shape:
 
-## 2. Keep the visitor id alive across navigation
+- **`?trakyo_id=probe-...` on a landing URL records no visit.** A `trakyo_id` in the
+  query string means "arrived from a tracking link": the tag stores that id and tags
+  links and embeds with it, but posts **no visit**. So a fresh browser context opened
+  on `https://www.customer.com/?trakyo_id=probe-<random>` is a free test of URL
+  handling that leaves nothing in the account (section 8). `&trakyo-no-track=1` goes
+  further and makes the tag do nothing at all, link tagging included; use it only to
+  test that the *site's own* redirects keep the query string.
+- **`unknown` from the verify endpoint means "could not determine", never "broken".**
+  JS-rendered shells (Vite/React builds from Lovable, v0, Bolt) come back `unknown`
+  because the tag is injected at runtime; judge those by `recent_activity` and the
+  dashboard.
+- **`recent_activity` is "this domain sent us an event in the last 24 h".** It is an
+  account+domain signal, not proof that this exact page works.
+
+## 3. Keep the visitor id alive across navigation
 
 The script reads `?trakyo_id=` (and `?tclid=`) off the landing URL and stores it
 in a 90-day apex-scoped cookie plus `localStorage`, so `www.`, apex and
@@ -74,7 +95,7 @@ away:
   example a first-touch "RevTrack"-style store that re-applies a saved value).
   It overwrites the current id with a stale one.
 
-## 3. Forms, booking widgets and checkouts
+## 4. Forms, booking widgets and checkouts
 
 The script auto-tags the vendors it knows (Calendly, Typeform, iClosed, Tally,
 AEvent, GoHighLevel, HubSpot Meetings, Framer embeds, Kajabi, Kit, Elementor,
@@ -87,13 +108,13 @@ For anything custom:
   fills it. Post it along with the lead to the account's custom-form webhook or
   CRM.
 - A booking or checkout reached by a **plain link** to another domain must carry
-  the id in the URL (section 2). Calendly and iClosed read it as `utm_term`;
+  the id in the URL (section 3). Calendly and iClosed read it as `utm_term`;
   every other vendor reads `trakyo_id`.
 - A purchase recorded on a **server** (payment webhook, CRM) must be sent to
   Trakyo with `identity.trakyo_id`; see the `trakyo-conversions` skill. Email
   alone identifies the person, not the journey, and lands under "Other".
 
-## 4. Content-Security-Policy
+## 5. Content-Security-Policy
 
 If the site sets a CSP, allow the tracking host:
 
@@ -101,13 +122,13 @@ If the site sets a CSP, allow the tracking host:
 script-src https://HOST; connect-src https://HOST; worker-src blob:
 ```
 
-## 5. Platform notes
+## 6. Platform notes
 
 Where the tag goes on each builder, and the builder-specific traps (Webflow drops
 query strings on internal links; Lovable/v0 emit URL-cleaning code; Framer wraps
 custom code in `srcdoc` iframes): [references/platforms.md](references/platforms.md).
 
-## 6. Self-check before saying "done"
+## 7. Self-check before saying "done"
 
 Re-read what you changed against the eight codes in
 [references/checks.md](references/checks.md). They are the same codes the verify
@@ -115,7 +136,7 @@ endpoint returns, so a self-check that passes here passes there. In particular:
 the tag has no `defer`/`async`, sits in `<head>` above every embed, appears once,
 and no redirect or URL-cleanup you touched drops the query string.
 
-## 7. Verify on the live site
+## 8. Verify on the live site
 
 Run the bundled check against every funnel URL (Node 18+, no dependencies; it
 fetches only the URLs you pass and, with a key, `api.trakyo.io`):
@@ -134,6 +155,7 @@ hand, with an API key that has `links:read` (dashboard → *API & MCP*):
 ```bash
 curl -s https://api.trakyo.io/v1/setup/verify \
   -H "Authorization: Bearer tky_live_..." -H "Content-Type: application/json" \
+  -H "X-Trakyo-Skill: trakyo-install@1.2.0" \
   -d '{"url":"https://www.customer.com/"}'
 ```
 
@@ -142,25 +164,18 @@ Read the response like this:
 - `status`: `ok` is done. `degraded` / `broken` / `not_installed`: apply every
   `findings[].fix` verbatim (each is the literal markup, already filled in with
   the account's host) and re-run.
-- `unknown` means **could not determine**, never "broken". JS-rendered shells
-  (Vite/React builds from Lovable, v0, Bolt) come back `unknown` because the tag
-  is injected at runtime; judge those by `recent_activity` and the dashboard.
-- `recent_activity` is "this domain sent us an event in the last 24 h". It is an
-  account+domain signal, not proof that this exact page works.
+- `unknown` and `recent_activity` mean less than they look: see section 2.
 
 Without an API key: open the site once in a normal browser, then check the
 Trakyo dashboard → *Custom Domains* → the domain shows a recent event.
 
 To check URL handling without recording a visit, open
-`https://www.customer.com/?trakyo_id=probe-<random>` in a fresh browser context.
-A `trakyo_id` on the landing URL is treated as "arrived from a tracking link": the
-tag stores that id and tags links and embeds with it, but posts **no visit**.
-Confirm the query string survives every redirect, `window.trakyo_id` equals the
-probe, and the probe appears on every booking link, embed `src` and checkout URL
-on the page. (`&trakyo-no-track=1` goes further and makes the tag do nothing at
-all; use it only to test that the *site's own* redirects keep the query string.)
+`https://www.customer.com/?trakyo_id=probe-<random>` in a fresh browser context
+(why that is safe: section 2). Confirm the query string survives every redirect,
+`window.trakyo_id` equals the probe, and the probe appears on every booking link,
+embed `src` and checkout URL on the page.
 
-## 8. Done means
+## 9. Done means
 
 1. The tag is on every page of every funnel domain, in the shape above.
 2. `/v1/setup/verify` returns `ok` (or `unknown` with `recent_activity: true`

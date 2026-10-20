@@ -4,7 +4,7 @@ description: "Report purchases, signups and bookings to Trakyo from a backend (P
 license: MIT
 metadata:
   author: trakyo
-  version: "1.1.0"
+  version: "1.2.0"
   docs: https://trakyo.io/docs/conversions
 ---
 
@@ -90,6 +90,21 @@ prevent, and nothing else will tell you.
   purchases. Send it.
 
 Full request/response and the batch endpoint: [references/server-side.md](references/server-side.md).
+
+## Gotchas
+
+Facts that defy reasonable assumptions. Each is a way an integration that looked
+right reported every sale under "Other".
+
+| Reasonable assumption | What actually happens |
+|---|---|
+| An email identifies the buyer, so the sale is attributed | Email identifies the *person*, not the *journey*. A buyer who was never a known lead opens a new lead with no history, and the sale lands under "Other". The response is still `201`. |
+| `identity.external_id` is an identifier, so it matches | It is stored for reference only: not a match key, not attribution. `event.external_id` is the one that dedupes. |
+| A `201` means it worked | A `201` means it was stored. Only `attribution.status` says whether it was credited; log it from the first call. |
+| Numbers are numbers | Money is a decimal **string** (`"997.00"`). A float is rejected, and a crypto currency code is rejected (`unsupported_currency`); convert at your settlement rate first. |
+| Old orders can be backfilled | `occurred_at` must be within the last 30 days. Older history is a data import, not a conversion. |
+| Sending the same sale twice is harmless | Within this endpoint it is (`event.external_id` dedupes). Across a connected integration (Stripe, Whop, Kajabi, Commas, Teachable) it is not: the sale is counted twice. |
+| The `trakyo_id` captured at signup is enough | Only if it was persisted. A payment webhook fires minutes or days later from a server that has no browser; it must read the id off the user or order row. |
 
 ## Done means
 

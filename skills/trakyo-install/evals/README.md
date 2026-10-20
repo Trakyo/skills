@@ -32,6 +32,43 @@ Pass rate: with skill 100%, baseline 69%.
 - **Cost**: the with-skill run reads SKILL.md plus one or two references and the script, about
   8k more tokens and 12 s longer per task.
 
+## Multi-model pass, 2026-10-20 (v1.2.0)
+
+The same three tasks, one run per eval and configuration, on Claude Haiku 4.5 and
+Claude Opus alongside the Sonnet 4.5 run above: same prompts, same grader (two of
+its regexes were widened so a helper module, a multi-line object or a ternary
+counts; the Sonnet numbers did not move). Time and tokens are with skill / baseline.
+
+| Model | Eval | With skill | Baseline | Time | Tokens |
+|---|---|---|---|---|---|
+| Haiku 4.5 | `lovable-vite-site` | 5/6 | 0/6 | 119 s / 134 s | 103k / 101k |
+| Haiku 4.5 | `nextjs-app-router` | 3/5 | 2/5 | 119 s / 66 s | 103k / 90k |
+| Haiku 4.5 | `audit-static-html` | 2/5 | 0/5 | 66 s / 52 s | 93k / 89k |
+| **Haiku 4.5** | **total** | **10/16** | **2/16** | | |
+| Sonnet 4.5 | total | 16/16 | 11/16 | 45 s / 34 s | 124k / 116k |
+| Opus | `lovable-vite-site` | 6/6 | 2/6 | 75 s / 72 s | 132k / 120k |
+| Opus | `nextjs-app-router` | 5/5 | 4/5 | 70 s / 60 s | 131k / 118k |
+| Opus | `audit-static-html` | 5/5 | 4/5 | 98 s / 58 s | 134k / 117k |
+| **Opus** | **total** | **16/16** | **10/16** | | |
+
+What the runs showed:
+
+- **Sonnet and Opus with the skill pass everything; the skill's value on a strong
+  model is still the exact tag URL, the hidden `trakyo_id` input and knowing the
+  verify endpoint exists.** The Opus baseline guessed `/trakyo.js` for the tag path
+  and never mentioned a way to verify; it fixed the redirect and the URL cleaner on
+  its own.
+- **Haiku follows the shape rules but not the procedure.** With the skill it
+  placed one blocking tag from the right host in every run, but in `audit-static-html`
+  it left the tag below the Typeform embed, wrote a report that named none of the
+  five problems, and in two of three runs never said how to verify. The skill
+  still moved it from 2 to 10 assertions; a Haiku-class agent needs the numbered
+  checklist more literally than the prose gives it. Not changed on this pass:
+  the fix for a weak model is a tighter "Done means" list, which is a separate
+  iteration with its own benchmark.
+- **The eval set is discriminating on every model** except `audit-static-html`
+  on Sonnet, as noted above.
+
 ## Trigger set, 2026-10-20
 
 `trigger-set.json` holds 20 queries: 10 that should load this skill and 10 near misses

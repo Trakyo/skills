@@ -1,0 +1,21 @@
+{
+  "name": "trakyo",
+  "version": "1.2.0",
+  "description": "Install Trakyo tracking correctly, keep it working through code changes, and send conversions that are attributed. Three skills: trakyo-install, trakyo-tracking-guard, trakyo-conversions.",
+  "author": {
+    "name": "Trakyo",
+    "email": "support@trakyo.io",
+    "url": "https://trakyo.io"
+  },
+  "homepage": "https://trakyo.io/docs/install/agents",
+  "repository": "https://github.com/Trakyo/skills",
+  "license": "MIT",
+  "keywords": [
+    "trakyo",
+    "attribution",
+    "tracking",
+    "analytics",
+    "conversions",
+    "youtube"
+  ]
+}

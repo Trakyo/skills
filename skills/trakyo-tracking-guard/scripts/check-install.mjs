@@ -19,7 +19,7 @@
  * no dependencies, so it can run in any CI step without an install.
  */
 
-const VERSION = "1.1.0"; // keep equal to metadata.version in SKILL.md
+const VERSION = "1.2.0"; // keep equal to metadata.version in SKILL.md
 
 // Why these numbers:
 //  - 15 s per request: a page that needs longer to answer has a problem this
@@ -29,7 +29,11 @@ const VERSION = "1.1.0"; // keep equal to metadata.version in SKILL.md
 const DEFAULT_TIMEOUT_MS = 15_000;
 const MAX_HOPS = 10;
 const API_BASE = "https://api.trakyo.io";
-const UA = `trakyo-check-install/${VERSION} (+https://github.com/Trakyo/skills)`;
+// Identification, so a site owner can recognise the traffic and Trakyo can count
+// skill-driven calls: the User-Agent on every request, and X-Trakyo-Skill on the
+// API call (the API logs that header; it carries no identity, the bearer does).
+const SKILL_TAG = `check-install@${VERSION}`;
+const UA = `trakyo-skill/${SKILL_TAG} (+https://github.com/Trakyo/skills)`;
 
 const HELP = `check-install ${VERSION} — pre-deploy check that Trakyo tracking is installed correctly
 
@@ -262,7 +266,7 @@ function staticChecks(html, finalUrl, knownHost) {
 async function apiVerify(url) {
   const res = await fetch(`${API_BASE}/v1/setup/verify`, {
     method: "POST",
-    headers: { authorization: `Bearer ${apiKey}`, "content-type": "application/json", "user-agent": UA },
+    headers: { authorization: `Bearer ${apiKey}`, "content-type": "application/json", "user-agent": UA, "x-trakyo-skill": SKILL_TAG },
     body: JSON.stringify({ url }),
     signal: AbortSignal.timeout(timeoutMs),
   });
@@ -325,7 +329,11 @@ for (const url of urls) {
 
   if (probe) {
     const probeId = `probe-${Math.random().toString(36).slice(2, 10)}`;
-    const probeUrl = new URL(page.finalUrl);
+    // From the URL the user passed, not page.finalUrl: the point is to travel the
+    // same redirect chain a visitor does and see whether trakyo_id comes out the
+    // other end. Built from the landing URL it skipped every redirect, so a
+    // redirect that dropped the query string passed (found by an eval run, v1.2.0).
+    const probeUrl = new URL(url);
     probeUrl.searchParams.set("trakyo_id", probeId);
     probeUrl.searchParams.set("trakyo-no-track", "1");
     try {

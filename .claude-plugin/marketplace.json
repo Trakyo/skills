@@ -1,0 +1,36 @@
+{
+  "name": "trakyo",
+  "owner": {
+    "name": "Trakyo",
+    "email": "support@trakyo.io"
+  },
+  "metadata": {
+    "description": "Trakyo's agent skills: install the tracking tag, guard it through deploys, report attributed conversions.",
+    "version": "1.2.0"
+  },
+  "plugins": [
+    {
+      "name": "trakyo",
+      "source": "./",
+      "description": "Install Trakyo tracking correctly, keep it working through code changes, and send conversions that are attributed. Three skills: trakyo-install, trakyo-tracking-guard, trakyo-conversions.",
+      "version": "1.2.0",
+      "author": {
+        "name": "Trakyo",
+        "email": "support@trakyo.io",
+        "url": "https://trakyo.io"
+      },
+      "homepage": "https://trakyo.io/docs/install/agents",
+      "repository": "https://github.com/Trakyo/skills",
+      "license": "MIT",
+      "keywords": [
+        "trakyo",
+        "attribution",
+        "tracking",
+        "analytics",
+        "conversions",
+        "youtube"
+      ],
+      "category": "productivity"
+    }
+  ]
+}

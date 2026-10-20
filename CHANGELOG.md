@@ -12,6 +12,45 @@ follow [SemVer](https://semver.org/): a change that makes an agent do something
 different on the same prompt is minor, a wording or reference fix is patch, a
 removed skill or renamed script flag is major.
 
+## [1.2.0] - 2026-10-20
+
+### Added
+- The Agent Skills discovery index: `index.json` on every release, served at
+  `https://trakyo.io/.well-known/agent-skills/index.json`, so
+  `npx skills add https://trakyo.io` installs from the domain and verifies each
+  tarball's SHA-256 digest.
+- A Claude Code plugin: `.claude-plugin/plugin.json` and `marketplace.json`, so
+  `claude plugin marketplace add Trakyo/skills` then `claude plugin install
+  trakyo@trakyo` installs all three skills.
+- A `Gotchas` section in every skill: the environment facts that defy reasonable
+  assumptions (a probe URL records no visit, `unknown` is not "broken", an
+  email-only conversion is stored with a `201` and credited to nobody, and so on),
+  collected in one place instead of scattered through the steps.
+- A table of contents in `trakyo-conversions/references/server-side.md`.
+- Adoption telemetry you can see: `check-install.mjs` identifies itself as
+  `trakyo-skill/check-install@<version>` and sends `X-Trakyo-Skill` on its API
+  call; the documented `curl` and fetch examples send
+  `X-Trakyo-Skill: <skill>@<version>`. The header carries no identity (the bearer
+  token does) and only counts skill-driven requests in Trakyo's API log.
+- Eval results for Claude Haiku 4.5 and Claude Opus alongside Sonnet 4.5 in each
+  skill's `evals/README.md`.
+- The install guide is also a resource of the Trakyo MCP server
+  (`trakyo://install-guide`, the body of `trakyo-install/SKILL.md`) and a page on
+  the docs site (`trakyo.io/docs/install`, with `/docs/install/agents` for the
+  agent install paths).
+
+### Fixed
+- `check-install.mjs --probe` built the probe URL from the page it landed on
+  after following redirects, not from the URL you passed, so it never travelled
+  the redirect chain it exists to test: a redirect that dropped the query string
+  passed unless the input URL already carried one. Found by the Opus eval run.
+
+### Fixed
+- Release tarballs unpack to the skill's files with `SKILL.md` at the root, which is
+  what the discovery clients require; v1.1.0's were nested one directory down and
+  the `npx skills` CLI rejected them. They are now reproducible byte for byte
+  (`gzip -n`) and in ustar format.
+
 ## [1.1.0] - 2026-10-19
 
 ### Added

@@ -35,6 +35,47 @@ Pass rate: with skill 100%, baseline 73%.
 - **To make the first two evals discriminate**, add variants without `AGENTS.md`; keep these as
   the "section already present" regression.
 
+## Multi-model pass, 2026-10-20 (v1.2.0)
+
+The same three tasks, one run per eval and configuration, on Claude Haiku 4.5 and
+Claude Opus alongside the Sonnet 4.5 run above: same prompts, same grader (two of
+its regexes were widened so a helper module, a multi-line object or a ternary
+counts; the Sonnet numbers did not move). Time and tokens are with skill / baseline.
+
+| Model | Eval | With skill | Baseline | Time | Tokens |
+|---|---|---|---|---|---|
+| Haiku 4.5 | `pr-diff-review` | 4/5 | 2/5 | 128 s / 134 s | 105k / 102k |
+| Haiku 4.5 | `add-agents-section` | 4/5 | 1/5 | 92 s / 178 s | 101k / 105k |
+| Haiku 4.5 | `consent-banner` | 3/5 | 1/5 | 113 s / 65 s | 98k / 90k |
+| **Haiku 4.5** | **total** | **11/15** | **4/15** | | |
+| Sonnet 4.5 | total | 15/15 | 11/15 | 43 s / 51 s | 122k / 119k |
+| Opus | `pr-diff-review` | 5/5 | 5/5 | 97 s / 83 s | 130k / 124k |
+| Opus | `add-agents-section` | 5/5 | 1/5 | 178 s / 129 s | 143k / 125k |
+| Opus | `consent-banner` | 5/5 | 5/5 | 113 s / 86 s | 135k / 122k |
+| **Opus** | **total** | **15/15** | **11/15** | | |
+
+What the runs showed:
+
+- **`pr-diff-review` and `consent-banner` do not discriminate on Opus**: the
+  fixture project's `AGENTS.md` already carries the Trakyo rules, and Opus
+  follows them without the skill. That is the skill's own mechanism working
+  (step 5 exists so the rules outlive the session), and it is why
+  `add-agents-section` is the eval that matters: the baseline wrote its own
+  rules, its own check script and its own CI step, and covered one of the five
+  assertions.
+- **The Opus run found a bug in the check script.** `check-install.mjs --probe`
+  built the probe URL from the page it landed on after following redirects, not
+  from the URL passed in, so it never travelled the redirect chain it was meant to
+  test; a redirect that dropped the query string passed unless the input URL
+  already carried one. Fixed in v1.2.0 (`scripts/__tests__/check-install-probe.test.ts`
+  in the monorepo pins it with a local redirecting server). The agent worked
+  around it by appending `?utm_source=trakyo-check` to the URLs in its `npm run
+  check:tracking`, which was the right call.
+- **Haiku with the skill audits well and reports poorly**: it fixed three of the
+  four PR breakages and wrote a complete `AGENTS.md`, but in two of three runs its
+  report never mentioned the probe URL or the check script, and on the consent
+  banner it gated nothing and said nothing about the attribution trade-off.
+
 ## Trigger set, 2026-10-20
 
 `trigger-set.json` holds 20 queries: 10 that should load this skill and 10 near misses

@@ -31,6 +31,41 @@ Pass rate: with skill 100%, baseline 47%.
 - **Both configurations** captured `trakyo_id` at signup from the hidden field or the cookie, so
   the capture pattern is the part a strong model infers on its own.
 
+## Multi-model pass, 2026-10-20 (v1.2.0)
+
+The same three tasks, one run per eval and configuration, on Claude Haiku 4.5 and
+Claude Opus alongside the Sonnet 4.5 run above: same prompts, same grader (two of
+its regexes were widened so a helper module, a multi-line object or a ternary
+counts; the Sonnet numbers did not move). Time and tokens are with skill / baseline.
+
+| Model | Eval | With skill | Baseline | Time | Tokens |
+|---|---|---|---|---|---|
+| Haiku 4.5 | `stripe-webhook-email-only` | 4/5 | 2/5 | 96 s / 91 s | 99k / 95k |
+| Haiku 4.5 | `express-greenfield` | 4/5 | 0/5 | 82 s / 80 s | 99k / 94k |
+| Haiku 4.5 | `thank-you-page` | 4/5 | 2/5 | 54 s / 40 s | 91k / 87k |
+| **Haiku 4.5** | **total** | **12/15** | **4/15** | | |
+| Sonnet 4.5 | total | 15/15 | 7/15 | 38 s / 33 s | 120k / 115k |
+| Opus | `stripe-webhook-email-only` | 5/5 | 3/5 | 98 s / 151 s | 128k / 135k |
+| Opus | `express-greenfield` | 5/5 | 3/5 | 98 s / 201 s | 129k / 152k |
+| Opus | `thank-you-page` | 5/5 | 3/5 | 63 s / 55 s | 121k / 116k |
+| **Opus** | **total** | **15/15** | **9/15** | | |
+
+What the runs showed:
+
+- **The Opus baseline read the public OpenAPI spec and got close.** Without the
+  skill it still captured `trakyo_id`, used the session id as `external_id` and
+  logged attribution in the Stripe eval; what it missed is what the spec does not
+  say: on the thank-you page it invented a `window.trakyo.conversion(...)` call
+  instead of the hosted snippet, and in the greenfield eval it never surfaced
+  `attribution.status`. Part of its remaining gap is the grader's, which credits an
+  inline `identity: { ... }` and not an identity object built elsewhere. It also
+  took longer and spent more tokens than with the skill, 151 s and 201 s against
+  98 s, because it went looking for the contract the skill hands it.
+- **Haiku with the skill sends the right identity but drops a field each time**:
+  a numeric `value` in one run, no `value` at all in another, a report that did
+  not explain dedupe on the thank-you page. The baseline sent email only in every
+  backend run, which is the "100% under Other" failure the skill exists to stop.
+
 ## Trigger set, 2026-10-20
 
 `trigger-set.json` holds 20 queries: 10 that should load this skill and 10 near misses
