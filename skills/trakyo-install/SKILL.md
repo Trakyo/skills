@@ -1,10 +1,11 @@
 ---
 name: trakyo-install
-description: Install the Trakyo tracking tag on a website correctly, or audit an existing install. Use when asked to "install Trakyo", "add the tracking script", "set up Trakyo tracking", "add trakyo.js", or when attribution / tracking "isn't working", "stopped working", or sales show up under "Other". Covers the exact tag shape (blocking, in <head>, once), parameter forwarding (trakyo_id, tclid, utm_*), booking/form embeds, and verification with POST /v1/setup/verify.
+description: "Install the Trakyo tracking tag on a website correctly, or audit an existing install: the exact tag shape (blocking, in <head>, once, from the account's tracking host), the redirect and URL rules that keep trakyo_id alive, booking and form embeds, a per-platform table (Next.js, Vite/Lovable/v0, Webflow, Framer, WordPress, Shopify, GTM) and verification with scripts/check-install.mjs or POST /v1/setup/verify. Use whenever the user mentions Trakyo, trakyo.js, latest.js or a go.<domain> tracking host, asks to \"install the tracking script\" or \"set up attribution\", or says tracking \"isn't working\", \"stopped working\", bookings reset, or sales show under \"Other\", even when they never say \"install\". For reporting purchases or signups from a backend or thank-you page use trakyo-conversions instead; for reviewing changes to a site that is already tracked use trakyo-tracking-guard."
 license: MIT
+compatibility: Any agent that reads SKILL.md. scripts/check-install.mjs needs Node.js 18+ (built-in fetch) and network access to the site under test and to api.trakyo.io; it writes no files and reads no environment variable other than TRAKYO_API_KEY.
 metadata:
   author: trakyo
-  version: "1.0"
+  version: "1.1.0"
   docs: https://trakyo.io/docs
 ---
 
@@ -116,7 +117,19 @@ and no redirect or URL-cleanup you touched drops the query string.
 
 ## 7. Verify on the live site
 
-With an API key that has `links:read` (dashboard → *API & MCP*):
+Run the bundled check against every funnel URL (Node 18+, no dependencies; it
+fetches only the URLs you pass and, with a key, `api.trakyo.io`):
+
+```bash
+node scripts/check-install.mjs https://www.customer.com/ https://www.customer.com/pricing \
+     --host go.customer.com --probe
+node scripts/check-install.mjs https://www.customer.com/ --host go.customer.com \
+     --api-key "$TRAKYO_API_KEY"        # authoritative: POST /v1/setup/verify, scope links:read
+```
+
+`--help` documents every flag, the exit codes (0 pass, 1 critical finding, 2 fetch
+or usage error) and `--json` for a machine-readable report. The same endpoint by
+hand, with an API key that has `links:read` (dashboard → *API & MCP*):
 
 ```bash
 curl -s https://api.trakyo.io/v1/setup/verify \

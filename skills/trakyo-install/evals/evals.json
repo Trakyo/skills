@@ -1,0 +1,54 @@
+{
+  "skill_name": "trakyo-install",
+  "evals": [
+    {
+      "id": 1,
+      "name": "lovable-vite-site",
+      "prompt": "Install Trakyo tracking on this site. Our tracking host is go.acme-coaching.com. The project is a Vite + React app that Lovable generated for us.",
+      "expected_output": "The blocking Trakyo tag in index.html <head> above the Calendly widget script and above the module script; the URL-cleaning helper no longer strips tracking parameters (deleted or exempting them); the / -> /home Navigate forwards location.search; a hidden trakyo_id input on the Apply form; the report tells the user how it verified (check-install.mjs, /v1/setup/verify or the probe URL).",
+      "files": [
+        "evals/files/lovable-vite-site"
+      ],
+      "assertions": [
+        "index.html contains exactly one <script src=\"https://go.acme-coaching.com/api/js/latest.js\"></script> with no defer or async attribute",
+        "The Trakyo tag is inside <head> and appears before the Calendly widget.js script",
+        "stripDuplicateUrlParams no longer removes trakyo_id / utm_* parameters (the function is deleted, no longer called, or exempts tracking parameters)",
+        "The / to /home redirect forwards the query string (window.location.search or equivalent)",
+        "The Apply form carries a hidden input named trakyo_id that is posted with the lead",
+        "The final report says how to verify the install (check-install.mjs, POST /v1/setup/verify, or the ?trakyo_id=probe URL)"
+      ]
+    },
+    {
+      "id": 2,
+      "name": "nextjs-app-router",
+      "prompt": "Trakyo attribution on our Next.js site is broken, every sale shows under 'Other' in the dashboard. Can you fix our install? Tracking host is go.acme-coaching.com.",
+      "expected_output": "The next/script afterInteractive tag replaced by a plain blocking <script> in the root layout's <head> (or next/script with strategy beforeInteractive); middleware redirects preserve request.nextUrl.search; a hidden trakyo_id input on the signup form; the Calendly loader no longer runs before the tag; verification steps in the report.",
+      "files": [
+        "evals/files/nextjs-app-router"
+      ],
+      "assertions": [
+        "The Trakyo tag in app/layout.tsx is no longer loaded with next/script strategy afterInteractive or lazyOnload: it is a plain <script src=\"https://go.acme-coaching.com/api/js/latest.js\"> in <head>, or next/script with strategy=\"beforeInteractive\"",
+        "Both middleware redirects keep the query string (the destination URL carries request.nextUrl.search, or the URL is cloned and only pathname changed)",
+        "The signup form in app/home/page.tsx has a hidden input named trakyo_id",
+        "The Trakyo tag is loaded before the Calendly widget script",
+        "The final report says how to verify (check-install.mjs, POST /v1/setup/verify, or the probe URL)"
+      ]
+    },
+    {
+      "id": 3,
+      "name": "audit-static-html",
+      "prompt": "Audit the Trakyo install on these two pages and fix whatever is wrong. Our tracking host is go.acme-coaching.com.",
+      "expected_output": "index.html ends with exactly one blocking tag from go.acme-coaching.com in <head>, above the Typeform embed script; the trakyo.link copy and the body copy are gone; pricing.html's self-hosted /js/trakyo.min.js is replaced by the hosted tag; the report names each finding (duplicate, deferred, wrong host, loaded after a vendor embed, self-hosted) and how it verified.",
+      "files": [
+        "evals/files/audit-static-html"
+      ],
+      "assertions": [
+        "public/index.html contains exactly one Trakyo tag, loaded from https://go.acme-coaching.com/api/js/latest.js, with no defer or async, inside <head>",
+        "In public/index.html the Trakyo tag appears before the Typeform embed.js script",
+        "public/pricing.html no longer loads /js/trakyo.min.js and instead carries <script src=\"https://go.acme-coaching.com/api/js/latest.js\"></script> in <head>",
+        "The final report names at least three of: duplicate tag, deferred tag, wrong host (trakyo.link), tag after the Typeform embed, self-hosted copy",
+        "The final report says how to verify (check-install.mjs, POST /v1/setup/verify, or the probe URL)"
+      ]
+    }
+  ]
+}

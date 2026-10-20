@@ -1,0 +1,5 @@
+{
+  "name": "acme-coaching-api",
+  "private": true,
+  "dependencies": { "express": "^4.21.0", "cookie-parser": "^1.4.7", "stripe": "^18.1.1" }
+}

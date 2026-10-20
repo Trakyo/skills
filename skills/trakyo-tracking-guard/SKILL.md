@@ -1,10 +1,11 @@
 ---
 name: trakyo-tracking-guard
-description: Keep Trakyo tracking working through code changes and deploys. Use when editing a site that already has Trakyo installed, when asked to "make sure tracking still works", "don't break attribution", "add a tracking check to CI", "write the AGENTS.md rules for Trakyo", or before merging changes to redirects, routers, URL handling, forms, checkout links, head scripts, consent banners or CSP. Audits a codebase for the patterns that silently lose attribution, adds the AGENTS.md section, and runs the pre-deploy check script.
+description: "Keep Trakyo tracking working through code changes and deploys on a site that already has the tag: audit a diff or codebase for the six silent attribution breakages (deferred, async or duplicate tag; URL-cleaning replaceState; redirects that drop the query string; forms without a trakyo_id field; cross-domain checkout links without the id), run scripts/check-install.mjs before deploy, and add the Trakyo section to the project's AGENTS.md. Use whenever a tracked site's redirects, routers, middleware, URL or canonical handling, forms, checkout links, head scripts, consent banners, CSP or SEO cleanup are being changed, when asked to \"make sure tracking still works\", \"don't break attribution\", \"add a tracking check to CI\" or \"write the AGENTS.md rules for Trakyo\", and whenever a project's AGENTS.md or README mentions Trakyo, even if the user does not. For a first-time install or a broken tag use trakyo-install instead; for sending conversions from a backend use trakyo-conversions."
 license: MIT
+compatibility: Any agent that reads SKILL.md. scripts/check-install.mjs needs Node.js 18+ (built-in fetch) and network access to the site under test and to api.trakyo.io; it writes no files and reads no environment variable other than TRAKYO_API_KEY.
 metadata:
   author: trakyo
-  version: "1.0"
+  version: "1.1.0"
   docs: https://trakyo.io/docs
 ---
 
@@ -55,14 +56,17 @@ node scripts/check-install.mjs https://www.customer.com/ --host go.customer.com 
 ```
 
 The script is at [scripts/check-install.mjs](scripts/check-install.mjs) (Node 18+,
-no dependencies). It prints every redirect hop and whether a query string survived
-it, applies the eight static rules, and with an API key prints the verify
-endpoint's status and `findings[].fix`. Exit 1 means a critical finding. `unknown`
+no dependencies; it fetches only the URLs you pass and, with a key, `api.trakyo.io`).
+It prints every redirect hop and whether a query string survived it, applies the
+eight static rules, and with an API key prints the verify endpoint's status and
+`findings[].fix`. Exit 0 is a pass, 1 a critical finding, 2 a fetch or usage error;
+`--json` gives a machine-readable report and `--help` the full interface. `unknown`
 from the API is not a failure: client-rendered apps inject the tag at runtime, so
 judge those by `recent_activity`.
 
 Copy the script into the project (`scripts/` or `.github/`), and add it to CI as a
-post-deploy step against the production URLs. It needs nothing but Node.
+post-deploy step against the production URLs, failing the job on exit 1. It needs
+nothing but Node.
 
 For client-side URL handling, which no fetch can see, use the probe URL in a real
 browser or in the project's existing Playwright/Cypress suite:

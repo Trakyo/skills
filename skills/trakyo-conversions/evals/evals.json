@@ -1,0 +1,53 @@
+{
+  "skill_name": "trakyo-conversions",
+  "evals": [
+    {
+      "id": 1,
+      "name": "stripe-webhook-email-only",
+      "prompt": "Our Stripe sales reach Trakyo but the dashboard files all of them under 'Other'. Fix our Trakyo integration in this Express app.",
+      "expected_output": "Signup persists the visitor's trakyo_id on the user (from the hidden form field or the apex trakyo_id cookie); the Stripe webhook sends identity.trakyo_id alongside the email, event.external_id set to the Checkout Session id, value as a decimal string, an Idempotency-Key header; the response's attribution.status/reason is logged.",
+      "files": [
+        "evals/files/stripe-webhook-email-only"
+      ],
+      "assertions": [
+        "The signup handler captures trakyo_id (from req.body.trakyo_id or the trakyo_id cookie) and persists it on the user record",
+        "The Stripe webhook's conversion request sends identity.trakyo_id read from the persisted user, in addition to identity.email",
+        "event.external_id is set to the Checkout Session id (or payment intent id) and event.value is a decimal string such as \"997.00\", not a number",
+        "The code reads attribution.status and attribution.reason from the response and logs them",
+        "An Idempotency-Key header is sent on the conversion request"
+      ]
+    },
+    {
+      "id": 2,
+      "name": "express-greenfield",
+      "prompt": "When an order is marked paid, report it to Trakyo as a purchase so it gets attributed to the right video. Add that to this Express app (app.acme-coaching.com).",
+      "expected_output": "trakyo_id captured at signup or order creation from the apex-scoped trakyo_id cookie (or ?trakyo_id= / hidden field) and stored on the user or order; on /orders/:id/paid a POST to https://api.trakyo.io/v1/conversions with identity.trakyo_id (+ email), event.kind purchase, event.external_id = order id, value as a decimal string, currency, Idempotency-Key; attribution.reason logged.",
+      "files": [
+        "evals/files/express-greenfield"
+      ],
+      "assertions": [
+        "trakyo_id is read from the trakyo_id cookie (or a trakyo_id body/query field) at signup or order creation and stored on the user or order",
+        "The paid handler POSTs to https://api.trakyo.io/v1/conversions with identity.trakyo_id",
+        "event.external_id is the order id, event.kind is purchase, event.value is a decimal string and event.currency is set",
+        "An Idempotency-Key header is sent",
+        "attribution.status / attribution.reason from the response is logged or otherwise surfaced"
+      ]
+    },
+    {
+      "id": 3,
+      "name": "thank-you-page",
+      "prompt": "Track purchases from this funnel thank-you page in Trakyo. The conversion id from the Trakyo dashboard is cnv_7f3a9 and our tracking host is go.acme-coaching.com.",
+      "expected_output": "The hosted conversion loader <script src=\"https://go.acme-coaching.com/api/js/c/cnv_7f3a9.js\" data-value=\"{{order_total}}\" data-email=\"{{contact.email}}\" defer></script> added to the page; the site-wide tag left as is; the report notes the order id on the confirmation URL (session_id) is what dedupes; no API key in the HTML.",
+      "files": [
+        "evals/files/thank-you-page"
+      ],
+      "assertions": [
+        "thank-you.html loads the hosted conversion loader https://go.acme-coaching.com/api/js/c/cnv_7f3a9.js",
+        "The loader is given data-value from {{order_total}} and data-email from {{contact.email}}",
+        "The site-wide tag <script src=\"https://go.acme-coaching.com/api/js/latest.js\"></script> is unchanged, present once, without defer or async",
+        "No Trakyo API key or direct browser POST to /v1/conversions appears in the HTML",
+        "The report explains that the order id on the confirmation URL (session_id) or in a data attribute is what makes the conversion idempotent"
+      ]
+    }
+  ]
+}

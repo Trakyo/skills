@@ -1,10 +1,10 @@
 ---
 name: trakyo-conversions
-description: Report purchases, signups and bookings to Trakyo from a backend (POST /v1/conversions) or a thank-you page, attributed to the click or visit that earned them. Use when asked to "send conversions to Trakyo", "track purchases", "report sales", "integrate the Trakyo API", "connect our payment webhook", or when Trakyo revenue shows under "Other", is unattributed, or payments from the API are not matching leads.
+description: "Report purchases, signups and bookings to Trakyo from a backend (POST /v1/conversions: identity.trakyo_id, event.external_id, batch, reversals, the attribution block on every response) or from a thank-you page (the hosted conversion snippet), so revenue is credited to the video, ad or link that earned it. Use whenever the user wants to send sales, orders, subscriptions, signups or bookings to Trakyo, integrate the Trakyo API, connect a Stripe, Whop, Shopify, CRM or payment webhook to Trakyo, or asks why Trakyo revenue shows under \"Other\", is unattributed, or API payments do not match leads. For installing or fixing the tracking tag itself use trakyo-install instead; for keeping an existing install safe through code changes use trakyo-tracking-guard."
 license: MIT
 metadata:
   author: trakyo
-  version: "1.0"
+  version: "1.1.0"
   docs: https://trakyo.io/docs/conversions
 ---
 

@@ -1,0 +1,82 @@
+[
+  {
+    "query": "Install Trakyo on our Webflow site, the tracking host is go.myfunnel.co",
+    "should_trigger": true
+  },
+  {
+    "query": "Can you add the trakyo.js script to this Next.js project? Host is go.acme.io. Make sure it loads on every page.",
+    "should_trigger": true
+  },
+  {
+    "query": "Our Trakyo attribution isn't working, all our Calendly bookings show up under Other in the dashboard. Here's the site repo.",
+    "should_trigger": true
+  },
+  {
+    "query": "Set up Trakyo tracking on this Lovable-generated landing page so our YouTube links get credited.",
+    "should_trigger": true
+  },
+  {
+    "query": "audit our trakyo install, I think something broke after the last redesign",
+    "should_trigger": true
+  },
+  {
+    "query": "We get a SCRIPT_DEFERRED finding from Trakyo's setup check. Fix it in our index.html.",
+    "should_trigger": true
+  },
+  {
+    "query": "add latest.js from go.coachpro.com to the head of our Framer site and make sure the booking widget gets the visitor id",
+    "should_trigger": true
+  },
+  {
+    "query": "Trakyo stopped tracking after we added Cloudflare redirects, can you figure out why and fix it?",
+    "should_trigger": true
+  },
+  {
+    "query": "I want our Trakyo tag to also run on app.ourdomain.com, not just the marketing site. Add it to the app's layout.",
+    "should_trigger": true
+  },
+  {
+    "query": "Verify the Trakyo tracking setup on https://www.example.com with our API key and apply whatever fixes it suggests",
+    "should_trigger": true
+  },
+  {
+    "query": "Add Google Analytics 4 to our Next.js site with the gtag snippet",
+    "should_trigger": false
+  },
+  {
+    "query": "Install the Meta pixel on our landing page and fire a Lead event on form submit",
+    "should_trigger": false
+  },
+  {
+    "query": "Our Stripe webhook keeps returning 400 signature errors, can you debug it?",
+    "should_trigger": false
+  },
+  {
+    "query": "Why is our Calendly embed so slow to load on mobile?",
+    "should_trigger": false
+  },
+  {
+    "query": "Send our paid orders from the Stripe webhook to Trakyo so they get attributed",
+    "should_trigger": false
+  },
+  {
+    "query": "Set up PostHog session recording on our React app",
+    "should_trigger": false
+  },
+  {
+    "query": "Add a cookie consent banner with CookieYes and gate GA behind it",
+    "should_trigger": false
+  },
+  {
+    "query": "Review this PR that changes our redirects; our site uses Trakyo so make sure tracking still works",
+    "should_trigger": false
+  },
+  {
+    "query": "Write a Playwright test that checks our signup form submits successfully",
+    "should_trigger": false
+  },
+  {
+    "query": "Our Shopify checkout is dropping UTM parameters, how do we keep them for Klaviyo?",
+    "should_trigger": false
+  }
+]

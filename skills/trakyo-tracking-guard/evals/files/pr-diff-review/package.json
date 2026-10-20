@@ -1,0 +1,8 @@
+{
+  "name": "acme-coaching-site",
+  "private": true,
+  "type": "module",
+  "scripts": { "dev": "vite", "build": "vite build" },
+  "dependencies": { "react": "^19.0.0", "react-dom": "^19.0.0", "react-router-dom": "^7.1.0" },
+  "devDependencies": { "vite": "^6.0.0", "typescript": "^5.7.0" }
+}

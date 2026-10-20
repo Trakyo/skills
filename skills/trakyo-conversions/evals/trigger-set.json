@@ -1,0 +1,82 @@
+[
+  {
+    "query": "Send purchases from our Stripe webhook to Trakyo so they get attributed to the right video",
+    "should_trigger": true
+  },
+  {
+    "query": "Our Trakyo dashboard shows all API payments under Other. The webhook sends email only. Fix our integration.",
+    "should_trigger": true
+  },
+  {
+    "query": "Integrate the Trakyo conversions API into our Django order service",
+    "should_trigger": true
+  },
+  {
+    "query": "Report a signup to Trakyo when a user registers in our Rails app",
+    "should_trigger": true
+  },
+  {
+    "query": "How do we track purchases on our ClickFunnels thank-you page with Trakyo? Conversion id is cnv_123",
+    "should_trigger": true
+  },
+  {
+    "query": "Backfill last month's Whop sales into Trakyo via the API",
+    "should_trigger": true
+  },
+  {
+    "query": "A customer got a refund, how do I reverse the conversion we sent to Trakyo?",
+    "should_trigger": true
+  },
+  {
+    "query": "connect our GoHighLevel payment webhook to trakyo so bookings and payments are credited to the ad",
+    "should_trigger": true
+  },
+  {
+    "query": "We send conversions to Trakyo but attribution.reason says no_attribution_identifier on every row. What are we doing wrong?",
+    "should_trigger": true
+  },
+  {
+    "query": "Add Trakyo purchase tracking to our Express checkout, the visitor id is in a cookie",
+    "should_trigger": true
+  },
+  {
+    "query": "Install the Trakyo tag on our Webflow site, host go.acme.com",
+    "should_trigger": false
+  },
+  {
+    "query": "Send Stripe purchase events to Meta's Conversions API from our backend",
+    "should_trigger": false
+  },
+  {
+    "query": "Set up Google Ads offline conversion import from our CRM",
+    "should_trigger": false
+  },
+  {
+    "query": "Our Stripe webhook keeps returning 400 signature errors, can you debug it?",
+    "should_trigger": false
+  },
+  {
+    "query": "Make sure the redirects in this PR don't break our Trakyo tracking before we deploy",
+    "should_trigger": false
+  },
+  {
+    "query": "Track button clicks in PostHog from our React app",
+    "should_trigger": false
+  },
+  {
+    "query": "Build a Stripe Checkout session for our pricing page",
+    "should_trigger": false
+  },
+  {
+    "query": "Write a webhook handler for Shopify orders/paid that updates inventory",
+    "should_trigger": false
+  },
+  {
+    "query": "Our Trakyo tag is loading with defer, fix the install",
+    "should_trigger": false
+  },
+  {
+    "query": "Add a thank-you page after checkout that shows the order summary",
+    "should_trigger": false
+  }
+]

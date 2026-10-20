@@ -1,0 +1,82 @@
+[
+  {
+    "query": "Review this PR before we deploy; our site uses Trakyo so make sure tracking still works",
+    "should_trigger": true
+  },
+  {
+    "query": "We're adding locale redirects (/ to /en) to our Next.js site. Don't break our Trakyo attribution.",
+    "should_trigger": true
+  },
+  {
+    "query": "Add a pre-deploy check to CI that fails if the Trakyo tag goes missing or gets deferred",
+    "should_trigger": true
+  },
+  {
+    "query": "Write the AGENTS.md rules for Trakyo so Lovable stops deleting our tracking script",
+    "should_trigger": true
+  },
+  {
+    "query": "I'm cleaning up our URL params for SEO with history.replaceState. The site has Trakyo installed, is that safe?",
+    "should_trigger": true
+  },
+  {
+    "query": "Move our checkout to a separate domain checkout.acme.com. We use Trakyo; keep attribution intact.",
+    "should_trigger": true
+  },
+  {
+    "query": "We're putting all scripts behind a cookie consent banner. What happens to our Trakyo tracking and how do we keep it working?",
+    "should_trigger": true
+  },
+  {
+    "query": "audit this codebase for anything that would break trakyo tracking",
+    "should_trigger": true
+  },
+  {
+    "query": "Add a newsletter form to the footer. Note the site is tracked by Trakyo (see AGENTS.md).",
+    "should_trigger": true
+  },
+  {
+    "query": "Add a Content-Security-Policy header to our site. We have Trakyo and Calendly on it.",
+    "should_trigger": true
+  },
+  {
+    "query": "Install the Trakyo tag on our new Webflow site, host go.acme.com",
+    "should_trigger": false
+  },
+  {
+    "query": "Send our Stripe purchases to Trakyo from the backend",
+    "should_trigger": false
+  },
+  {
+    "query": "Add a pre-commit hook that runs eslint and prettier",
+    "should_trigger": false
+  },
+  {
+    "query": "Review this PR that adds dark mode to our dashboard",
+    "should_trigger": false
+  },
+  {
+    "query": "Set up a GitHub Actions workflow to deploy our Next.js site to Vercel",
+    "should_trigger": false
+  },
+  {
+    "query": "Write a CODEOWNERS file and AGENTS.md describing our monorepo conventions",
+    "should_trigger": false
+  },
+  {
+    "query": "Our GA4 events stopped firing after we added the consent banner, fix it",
+    "should_trigger": false
+  },
+  {
+    "query": "Add redirects from our old blog URLs to the new ones in next.config.js",
+    "should_trigger": false
+  },
+  {
+    "query": "Write Playwright tests for the checkout flow",
+    "should_trigger": false
+  },
+  {
+    "query": "Add a Content-Security-Policy header that allows Stripe.js and Google Fonts",
+    "should_trigger": false
+  }
+]
