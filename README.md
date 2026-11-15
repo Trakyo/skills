@@ -131,8 +131,9 @@ This directory in the `trakyo` monorepo is canonical; the public repo
 pins the spec constraints in CI. The rules here must not drift from
 `src/lib/tracking/install-snippet.ts` (the tag shape and its reasoning),
 `workers/api/src/lib/setup-checks.ts` (the finding codes) and
-`workers/docs/pages/conversions.mdx` (the identity rules). When one of those
-changes, change the skill in the same PR. Two things are generated FROM the
+`pages/conversions.mdx` in the public repo `Trakyo/docs` (the identity rules).
+When one of the first two changes, change the skill in the same PR; when the docs
+page changes, change the skill here alongside that `Trakyo/docs` PR. Two things are generated FROM the
 skills and checked in CI: the MCP server's `trakyo://install-guide` resource
 (`scripts/skills/sync-install-guide.mjs`, from `trakyo-install/SKILL.md`) and the
 release's `index.json` (`scripts/skills/build-well-known-index.mjs`).
