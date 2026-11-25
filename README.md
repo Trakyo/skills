@@ -7,7 +7,7 @@ keep it working, and send conversions that are actually attributed.
 | Skill | Use it when |
 |---|---|
 | [`trakyo-install`](trakyo-install/SKILL.md) | Installing the tag on a site, or auditing an install that "isn't working". The exact tag shape, parameter forwarding, embeds, per-platform notes, verification with `scripts/check-install.mjs` and `POST /v1/setup/verify`. |
-| [`trakyo-conversions`](trakyo-conversions/SKILL.md) | Sending purchases / signups / bookings from a backend or thank-you page. The `identity.trakyo_id` rule, the attribution block, batch, reversals. |
+| [`trakyo-conversions`](trakyo-conversions/SKILL.md) | Sending purchases / signups / bookings / webinar attendance from a backend or thank-you page. The `identity.trakyo_id` rule, the attribution block, batch, reversals. |
 | [`trakyo-tracking-guard`](trakyo-tracking-guard/SKILL.md) | Any change to a site that is already tracked. The six silent breakages, the pre-deploy check script, the `AGENTS.md` section to drop into the project. |
 
 Each description ends with which sibling to use instead, so an agent holding all

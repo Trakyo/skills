@@ -5,7 +5,7 @@ license: MIT
 compatibility: Any agent that reads SKILL.md. scripts/check-install.mjs needs Node.js 18+ (built-in fetch) and network access to the site under test and to api.trakyo.io; it writes no files and reads no environment variable other than TRAKYO_API_KEY.
 metadata:
   author: trakyo
-  version: "1.2.0"
+  version: "1.3.0"
   docs: https://trakyo.io/docs
 ---
 
@@ -155,7 +155,7 @@ hand, with an API key that has `links:read` (dashboard → *API & MCP*):
 ```bash
 curl -s https://api.trakyo.io/v1/setup/verify \
   -H "Authorization: Bearer tky_live_..." -H "Content-Type: application/json" \
-  -H "X-Trakyo-Skill: trakyo-install@1.2.0" \
+  -H "X-Trakyo-Skill: trakyo-install@1.3.0" \
   -d '{"url":"https://www.customer.com/"}'
 ```
 

@@ -1,16 +1,17 @@
 ---
 name: trakyo-conversions
-description: "Report purchases, signups and bookings to Trakyo from a backend (POST /v1/conversions: identity.trakyo_id, event.external_id, batch, reversals, the attribution block on every response) or from a thank-you page (the hosted conversion snippet), so revenue is credited to the video, ad or link that earned it. Use whenever the user wants to send sales, orders, subscriptions, signups or bookings to Trakyo, integrate the Trakyo API, connect a Stripe, Whop, Shopify, CRM or payment webhook to Trakyo, or asks why Trakyo revenue shows under \"Other\", is unattributed, or API payments do not match leads. For installing or fixing the tracking tag itself use trakyo-install instead; for keeping an existing install safe through code changes use trakyo-tracking-guard."
+description: "Report purchases, signups, bookings and webinar attendance to Trakyo from a backend (POST /v1/conversions: identity.trakyo_id, event.external_id, batch, reversals, the attribution block on every response) or from a thank-you page (the hosted conversion snippet), so revenue is credited to the video, ad or link that earned it. Use whenever the user wants to send sales, orders, subscriptions, signups, bookings or webinar attendance to Trakyo, integrate the Trakyo API, connect a Stripe, Whop, Shopify, CRM or payment webhook to Trakyo, or asks why Trakyo revenue shows under \"Other\", is unattributed, or API payments do not match leads. For installing or fixing the tracking tag itself use trakyo-install instead; for keeping an existing install safe through code changes use trakyo-tracking-guard."
 license: MIT
 metadata:
   author: trakyo
-  version: "1.2.0"
+  version: "1.3.0"
   docs: https://trakyo.io/docs/conversions
 ---
 
 # Send conversions to Trakyo
 
-A conversion is a `purchase`, `signup` or `booking` that your system knows about.
+A conversion is a `purchase`, `signup`, `booking` or `attendance` that your system
+knows about.
 There are two ways to report it:
 
 | Where the outcome is known | Use |
@@ -91,6 +92,23 @@ prevent, and nothing else will tell you.
 
 Full request/response and the batch endpoint: [references/server-side.md](references/server-side.md).
 
+## Attendance (webinars and events)
+
+Send `kind: "attendance"` when someone who registered actually showed up, live or
+on replay. The registration itself stays a `signup`; never report attendance as a
+second `signup`, which would count the person as two opt-ins.
+
+- **Same identity as the registration**: the same `trakyo_id` and email put the
+  attendance on the same lead as the signup.
+- **One event per person per session.** An event cannot be changed once recorded,
+  so put the session in the id: `<registration id>:live:<session id>`, and a replay
+  as its own event, `<registration id>:replay:<session id>`. Watch time and join /
+  leave times go in `metadata`.
+- **Do not send no-shows.** A no-show is a signup with no attendance event.
+- It has no `value`, cannot be reversed, is not counted as an opt-in, booking or
+  sale, and is not sent to Meta unless the account picks it as a conversion event.
+  It shows on the lead's journey as "Attended" with the `name` you sent.
+
 ## Gotchas
 
 Facts that defy reasonable assumptions. Each is a way an integration that looked
@@ -104,6 +122,7 @@ right reported every sale under "Other".
 | Numbers are numbers | Money is a decimal **string** (`"997.00"`). A float is rejected, and a crypto currency code is rejected (`unsupported_currency`); convert at your settlement rate first. |
 | Old orders can be backfilled | `occurred_at` must be within the last 30 days. Older history is a data import, not a conversion. |
 | Sending the same sale twice is harmless | Within this endpoint it is (`event.external_id` dedupes). Across a connected integration (Stripe, Whop, Kajabi, Commas, Teachable) it is not: the sale is counted twice. |
+| Attendance is just another signup | A second `signup` double-counts the opt-in. Send `kind: "attendance"`: it is recorded on the lead's journey and changes no opt-in total. Attendance ids are deduplicated among themselves only, so one may reuse the signup's `external_id`. |
 | The `trakyo_id` captured at signup is enough | Only if it was persisted. A payment webhook fires minutes or days later from a server that has no browser; it must read the id off the user or order row. |
 
 ## Done means

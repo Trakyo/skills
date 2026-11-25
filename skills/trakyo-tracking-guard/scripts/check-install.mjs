@@ -19,7 +19,7 @@
  * no dependencies, so it can run in any CI step without an install.
  */
 
-const VERSION = "1.2.0"; // keep equal to metadata.version in SKILL.md
+const VERSION = "1.3.0"; // keep equal to metadata.version in SKILL.md
 
 // Why these numbers:
 //  - 15 s per request: a page that needs longer to answer has a problem this

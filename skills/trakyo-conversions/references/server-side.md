@@ -16,7 +16,7 @@ curl https://api.trakyo.io/v1/conversions \
   -H "Authorization: Bearer tky_live_..." \
   -H "Content-Type: application/json" \
   -H "Idempotency-Key: 8f2c1a90-..." \
-  -H "X-Trakyo-Skill: trakyo-conversions@1.2.0" \
+  -H "X-Trakyo-Skill: trakyo-conversions@1.3.0" \
   -d '{
     "identity": {
       "trakyo_id": "9f2c8b1e-...",
@@ -53,7 +53,7 @@ are present: email → phone → fingerprint → click.
 
 | Field | Required | Notes |
 |---|---|---|
-| `kind` | yes | `purchase`, `signup`, `booking`. |
+| `kind` | yes | `purchase`, `signup`, `booking`, `attendance` (a webinar or event attended, live or on replay: no `value`, not reversible, deduplicated among attendance events only). |
 | `external_id` | yes | Your order / invoice / registration id. Dedupe key and reversal handle. |
 | `name` | no, but send it | Form name for signups; label for purchases. |
 | `value` | purchases | Decimal string, `> 0`. Or send `conversion_id` of a saved Custom Conversion and omit `value`. |
@@ -119,7 +119,7 @@ await db.users.update(userId, { trakyo_id: trakyoId ?? existing });   // keep fi
 await fetch("https://api.trakyo.io/v1/conversions", {
   method: "POST",
   headers: { Authorization: `Bearer ${TRAKYO_KEY}`, "Content-Type": "application/json",
-             "Idempotency-Key": order.id, "X-Trakyo-Skill": "trakyo-conversions@1.2.0" },
+             "Idempotency-Key": order.id, "X-Trakyo-Skill": "trakyo-conversions@1.3.0" },
   body: JSON.stringify({
     identity: { trakyo_id: user.trakyo_id ?? undefined, email: user.email, external_id: user.id },
     event: { kind: "purchase", external_id: order.id, name: order.product,

@@ -6,14 +6,14 @@
   },
   "metadata": {
     "description": "Trakyo's agent skills: install the tracking tag, guard it through deploys, report attributed conversions.",
-    "version": "1.2.0"
+    "version": "1.3.0"
   },
   "plugins": [
     {
       "name": "trakyo",
       "source": "./",
       "description": "Install Trakyo tracking correctly, keep it working through code changes, and send conversions that are attributed. Three skills: trakyo-install, trakyo-tracking-guard, trakyo-conversions.",
-      "version": "1.2.0",
+      "version": "1.3.0",
       "author": {
         "name": "Trakyo",
         "email": "support@trakyo.io",

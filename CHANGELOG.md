@@ -12,6 +12,14 @@ follow [SemVer](https://semver.org/): a change that makes an agent do something
 different on the same prompt is minor, a wording or reference fix is patch, a
 removed skill or renamed script flag is major.
 
+## [1.3.0] - 2026-11-25
+
+### Added
+- `trakyo-conversions`: the `attendance` conversion kind (a webinar or event
+  attended, live or on replay). When to send it instead of a second `signup`, the
+  `external_id` shape for sessions and replays, and what it does not do (no value,
+  no reversal, no opt-in count).
+
 ## [1.2.0] - 2026-10-20
 
 ### Added
